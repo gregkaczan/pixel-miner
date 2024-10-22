@@ -94,7 +94,7 @@ public class MoveController : MonoBehaviour
             currentPosition.y = maxYPosition;
 
             // Update the Rigidbody's position
-            rb.position = currentPosition;
+            rb.position = currentPosition; 
 
             // If the capsule is moving upwards, prevent it
             if (rb.linearVelocity.y > 0)
@@ -110,7 +110,7 @@ public class MoveController : MonoBehaviour
     {
         // Rotation code
         Vector2 direction = target - rb.position;
-        float desiredAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        float desiredAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + -90f;
 
         // Calculate the shortest angle difference
         float angleDifference = Mathf.DeltaAngle(rb.rotation, desiredAngle);
