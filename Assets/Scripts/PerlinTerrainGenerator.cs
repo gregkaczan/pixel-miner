@@ -199,6 +199,14 @@ public class PerlinTerrainGenerator : MonoBehaviour
                             // Get the hardness of the pixel
                             float hardness = pixelHardness[xi, yj];
 
+                            if (hardness > 0.81f)
+                            {
+                                FindFirstObjectByType<NotificationManager>().ShowNotification("Soil", 1);
+                            } else if (hardness < 0.4f)
+                            {
+                                FindFirstObjectByType<NotificationManager>().ShowNotification("Rock", 1);
+                            }
+
                             // Adjust destruction probability based on hardness
                             float adjustedDestructionProbability = destructionProbability - hardness;
                             adjustedDestructionProbability = Mathf.Clamp01(adjustedDestructionProbability);
