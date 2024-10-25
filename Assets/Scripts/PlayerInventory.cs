@@ -172,7 +172,6 @@ namespace Assets.Scripts
         {
             m_ItemDetailHeader.text = item.FriendlyName;
             m_ItemDetailBody.text = item.Description;
-            m_ItemDetailPrice.text = item.SellPrice.ToString();
         }
 
         /// <summary>
