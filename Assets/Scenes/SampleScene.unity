@@ -1178,14 +1178,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9523dd7043aca74a95be1463a4f9c26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StoredItems:
-  - Details: {fileID: 11400000, guid: c112331293b6e994fbf4e296b4d4fcfb, type: 2}
-  - Details: {fileID: 11400000, guid: c112331293b6e994fbf4e296b4d4fcfb, type: 2}
-  - Details: {fileID: 11400000, guid: 2719d7d4b87f5a7428bc2e84447fca8d, type: 2}
-  - Details: {fileID: 11400000, guid: 626dba12e4423b84686e05a0c0828018, type: 2}
+  StoredItems: []
   InventoryDimensions:
-    Height: 5
-    Width: 5
+    Height: 9
+    Width: 6
 --- !u!1 &1988513867
 GameObject:
   m_ObjectHideFlags: 0

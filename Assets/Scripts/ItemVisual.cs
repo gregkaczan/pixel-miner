@@ -1,17 +1,18 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Assets.Scripts
 {
     public class ItemVisual : VisualElement
     {
-        private readonly ItemDefinition m_Item;
+        private readonly StoredItem m_Item;
         private Vector2 m_OriginalPosition;
         private bool m_IsDragging;
 
         private (bool canPlace, Vector2 position) m_PlacementResults;
 
-        public ItemVisual(ItemDefinition item)
+        public ItemVisual(StoredItem item)
         {
             //Set the reference
             m_Item = item;
@@ -19,7 +20,7 @@ namespace Assets.Scripts
             //Create a new visual element
             VisualElement icon = new VisualElement
             {
-                style = { backgroundImage = m_Item.Icon.texture },
+                style = { backgroundImage = m_Item.Details.Icon.texture },
                 name = "Icon"
             };
 
@@ -30,19 +31,27 @@ namespace Assets.Scripts
             AddToClassList("visual-icon-container");
             
             //Set properties 
-            name = $"{m_Item.FriendlyName}";
-            style.height = m_Item.SlotDimension.Height * PlayerInventory.SlotDimension.Height;
-            style.width = m_Item.SlotDimension.Width * PlayerInventory.SlotDimension.Width;
+            name = $"{m_Item.Details.FriendlyName}";
+            style.height = m_Item.Details.SlotDimension.Height * PlayerInventory.SlotDimension.Height;
+            style.width = m_Item.Details.SlotDimension.Width * PlayerInventory.SlotDimension.Width;
             style.visibility = Visibility.Hidden;
 
             //Register the mouse callbacks
             RegisterCallback<MouseMoveEvent>(OnMouseMoveEvent);
+            RegisterCallback<MouseDownEvent>(OnMouseDownEvent);
             RegisterCallback<MouseUpEvent>(OnMouseUpEvent);
+            RegisterCallback<MouseLeaveEvent>(OnMouseLeaveEvent);
+        }
+
+        private void OnMouseLeaveEvent(MouseLeaveEvent evt)
+        {
+            throw new NotImplementedException();
         }
 
         ~ItemVisual()
         {
             UnregisterCallback<MouseMoveEvent>(OnMouseMoveEvent);
+            UnregisterCallback<MouseDownEvent>(OnMouseDownEvent);
             UnregisterCallback<MouseUpEvent>(OnMouseUpEvent);
         }
 
@@ -66,26 +75,14 @@ namespace Assets.Scripts
         /// <summary>
         /// Handles logic for when the mouse has been released
         /// </summary>
-        private void OnMouseUpEvent(MouseUpEvent mouseEvent)
+        private void OnMouseDownEvent(MouseDownEvent mouseEvent)
         {
             if (!m_IsDragging)
             {
                 StartDrag();
-                PlayerInventory.UpdateItemDetails(m_Item);
                 return;
             }
 
-            m_IsDragging = false;
-
-            if (m_PlacementResults.canPlace)
-            {
-                SetPosition(new Vector2(
-                    m_PlacementResults.position.x - parent.worldBound.position.x,
-                    m_PlacementResults.position.y - parent.worldBound.position.y));
-                return;
-            }
-
-            SetPosition(new Vector2(m_OriginalPosition.x, m_OriginalPosition.y));
         }
 
         /// <summary>
@@ -105,11 +102,30 @@ namespace Assets.Scripts
         {
             if (!m_IsDragging)
             { 
+                PlayerInventory.UpdateItemDetails(m_Item.Details);
                 return; 
             }
 
             SetPosition(GetMousePosition(mouseEvent.mousePosition));
             m_PlacementResults = PlayerInventory.Instance.ShowPlacementTarget(this);
+        }
+
+        private void OnMouseUpEvent(MouseUpEvent mouseEvent)
+        {
+            m_IsDragging = false;
+
+            if (m_PlacementResults.canPlace)
+            {
+                SetPosition(new Vector2(
+                    m_PlacementResults.position.x - parent.worldBound.position.x,
+                    m_PlacementResults.position.y - parent.worldBound.position.y));
+
+                PlayerInventory.Instance.PlaceItem(m_Item, m_PlacementResults.position);
+
+                return;
+            }
+
+            SetPosition(new Vector2(m_OriginalPosition.x, m_OriginalPosition.y));
         }
     }
 }

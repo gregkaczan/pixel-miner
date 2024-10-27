@@ -6,7 +6,21 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UIElements;
+
+[System.Serializable]
+public class SerializationWrapper<T>
+{
+    public List<T> items;
+}
+
+[System.Serializable]
+public class InventoryItemData
+{
+    public string id;
+    public Vector2 pos;
+}
 
 namespace Assets.Scripts
 {
@@ -14,6 +28,7 @@ namespace Assets.Scripts
     public class StoredItem
     {
         public ItemDefinition Details;
+        public Vector2 Position;
         public ItemVisual RootVisual;
     }
 
@@ -118,7 +133,7 @@ namespace Assets.Scripts
 
             SlotDimension = new Dimensions
             {
-                Width = Mathf.RoundToInt(firstSlot.worldBound.width),
+                Width = Mathf.RoundToInt(firstSlot.worldBound.width) + 1,
                 Height = Mathf.RoundToInt(firstSlot.worldBound.height)
             };
         }
@@ -126,33 +141,71 @@ namespace Assets.Scripts
         private void AddItemToInventoryGrid(VisualElement item) => m_InventoryGrid.Add(item);
         private void RemoveItemFromInventoryGrid(VisualElement item) => m_InventoryGrid.Remove(item);
 
-        /// <summary>
-        /// Load all of the inventory items and set them in the default position. 
-        /// This is called from Start.
-        /// </summary>
         private async void LoadInventory()
         {
+
+            LoadInventoryFromFile();
+
             //make sure inventory is in ready state
             await UniTask.WaitUntil(() => m_IsInventoryReady);
 
             //load
             foreach (StoredItem loadedItem in StoredItems)
             {
-                ItemVisual inventoryItemVisual = new ItemVisual(loadedItem.Details);
+                ItemVisual inventoryItemVisual = new ItemVisual(loadedItem);
 
                 AddItemToInventoryGrid(inventoryItemVisual);
 
-                bool inventoryHasSpace = await GetPositionForItem(inventoryItemVisual);
-
-                if (!inventoryHasSpace)
-                {
-                    Debug.Log("No space - Cannot pick up the item");
-                    RemoveItemFromInventoryGrid(inventoryItemVisual);
-                    continue;
-                }
-
                 ConfigureInventoryItem(loadedItem, inventoryItemVisual);
             }
+
+            SaveInventoryToFile();
+            
+        }
+
+        public List<InventoryItemData> ConvertGridToData(List<StoredItem> storedItems)
+{
+        List<InventoryItemData> dataList = new List<InventoryItemData>();
+
+        foreach (var item in storedItems)
+        {
+            InventoryItemData data = new InventoryItemData();
+            data.id = item.Details.ID;
+            data.pos = item.Position;
+            
+            dataList.Add(data);
+        }
+        return dataList;
+    }
+
+        public void SaveInventoryToFile()
+        {
+            List<InventoryItemData> dataList = ConvertGridToData(StoredItems);
+            string jsonData = JsonUtility.ToJson(new SerializationWrapper<InventoryItemData> { items = dataList });
+
+            // Save the JSON data to a file
+            System.IO.File.WriteAllText(Application.persistentDataPath + "/ship.json", jsonData);
+        }
+
+        public void LoadInventoryFromFile()
+        {
+            string jsonData = System.IO.File.ReadAllText(Application.persistentDataPath + "/ship.json");
+            SerializationWrapper<InventoryItemData> wrapper = JsonUtility.FromJson<SerializationWrapper<InventoryItemData>>(jsonData);
+
+            List<StoredItem> loadedItems = new List<StoredItem>();
+            
+            foreach (var itemData in wrapper.items)
+            {
+                StoredItem item = new StoredItem
+                {
+                    Details = Resources.Load<ItemDefinition>($"Data/{itemData.id}"),
+                    Position = itemData.pos
+                };
+
+                loadedItems.Add(item);
+            }
+            
+            StoredItems = loadedItems;
         }
 
         /// <summary>
@@ -162,6 +215,7 @@ namespace Assets.Scripts
         {
             item.RootVisual = visual;
             visual.style.visibility = Visibility.Visible;
+            SetItemPosition(visual, new Vector2(item.Position.x * SlotDimension.Width, item.Position.y * SlotDimension.Height));
         }
 
         /// <summary>
@@ -244,6 +298,12 @@ namespace Assets.Scripts
 
             return (canPlace: true, targetSlot.worldBound.position);
 
+        }
+
+        public void PlaceItem(StoredItem item, Vector2 position)
+        {
+            item.Position = new Vector2(MathF.Floor(position.x / SlotDimension.Width), MathF.Floor(position.y / SlotDimension.Height));
+            SaveInventoryToFile();
         }
     }
 }
