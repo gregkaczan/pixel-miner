@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dcd6b523a36c2fd45bcd65b99cc1c76f, type: 3}
-  m_Name: 47350b30-ee0c-4076-8978-a486893f9536
+  m_Name: Engine
   m_EditorClassIdentifier: 
-  ID: 47350b30-ee0c-4076-8978-a486893f9536
-  FriendlyName: Flamethrower
-  Description: A level 5 Flamethrower.
-  SellPrice: 50
-  Icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  ID: Engine
+  FriendlyName: Engine
+  Description: Engine
+  SellPrice: 5
+  Icon: {fileID: -7607439545252080459, guid: cbfa87b0858328b75aacf7ab0f48220c, type: 3}
   SlotDimension:
-    Height: 1
+    Height: 2
     Width: 2

@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dcd6b523a36c2fd45bcd65b99cc1c76f, type: 3}
-  m_Name: a260a88e-1323-4926-ac98-85ad4350d3c5
+  m_Name: Reactor
   m_EditorClassIdentifier: 
-  ID: 39b09e31-893d-43f0-81fe-75d588619969
-  FriendlyName: Handgun
-  Description: A level 1 handgun that fires energy bullets.
-  SellPrice: 10
-  Icon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  ID: Reactor
+  FriendlyName: Reactor
+  Description: Reactor
+  SellPrice: 5
+  Icon: {fileID: 2738864586294743462, guid: 961e58d7b17c2de709f5d4656e7230a8, type: 3}
   SlotDimension:
-    Height: 1
-    Width: 1
+    Height: 2
+    Width: 2

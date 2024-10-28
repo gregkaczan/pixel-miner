@@ -1,3 +1,11 @@
+.container {
+    display: flex;
+}
+
+.hidden {
+    display: none;
+}
+
 .mini-header {
     flex-grow: 1;
     flex-shrink: 0;
@@ -13,7 +21,7 @@
     height: 100%;
     width: 100%;
     position: absolute;
-    padding: 15px;
+    padding: 0px;
     background-color: rgb(14, 14, 14);
     border-width: 1px;
     border-color: rgb(75, 75, 75);
@@ -26,16 +34,16 @@
 }
 
 .slot-icon {
-    height: 200px;
-    max-height: 150px;
-    min-height: 50px;
-    min-width: 50px;
-    max-width: 150px;
-    width: 200px;
+    height: 50px;
+    max-height: 50px;
+    min-height: 20px;
+    min-width: 20px;
+    max-width: 50px;
+    width: 50px;
     background-image: none;
     -unity-background-scale-mode: scale-to-fit;
     border-width: 1px;
-    border-color: rgb(75, 75, 75);
+    border-color: rgba(75, 75, 75, 0.2);
 }
 
 .slot-icon-highlighted {

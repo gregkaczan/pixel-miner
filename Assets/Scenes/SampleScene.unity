@@ -1180,8 +1180,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   StoredItems: []
   InventoryDimensions:
-    Height: 9
-    Width: 6
+    Height: 18
+    Width: 27
 --- !u!1 &1988513867
 GameObject:
   m_ObjectHideFlags: 0

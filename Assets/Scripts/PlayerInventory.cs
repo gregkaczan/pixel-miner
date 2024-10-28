@@ -19,7 +19,7 @@ public class SerializationWrapper<T>
 public class InventoryItemData
 {
     public string id;
-    public Vector2 pos;
+    public Vector2Int pos;
 }
 
 namespace Assets.Scripts
@@ -28,7 +28,7 @@ namespace Assets.Scripts
     public class StoredItem
     {
         public ItemDefinition Details;
-        public Vector2 Position;
+        public Vector2Int Position;
         public ItemVisual RootVisual;
     }
 
@@ -77,7 +77,16 @@ namespace Assets.Scripts
                 // Toggle the active state of the target object
                 if (m_IsInventoryReady && m_Root != null)
                 {
-                    m_Root.style.display = m_Root.style.display == DisplayStyle.None ? DisplayStyle.Flex : DisplayStyle.None;
+                    if (m_Root.Q<VisualElement>("Container").ClassListContains("hidden"))
+                    {
+                        m_Root.Q<VisualElement>("Container").RemoveFromClassList("hidden");
+                        Configure();
+                        ReloadFromSave();
+                    }
+                    else
+                    {
+                        m_Root.Q<VisualElement>("Container").AddToClassList("hidden");
+                    }
                 }
             }
         }
@@ -95,6 +104,22 @@ namespace Assets.Scripts
             m_ItemDetailBody = itemDetails.Q<Label>("Body");
             m_ItemDetailPrice = itemDetails.Q<Label>("SellPrice");
 
+            // Hack to get move from the grid not the tiny visual element.
+            m_Root.RegisterCallback<MouseMoveEvent>(evt => {
+                StoredItem item = StoredItems.FirstOrDefault(s => s.RootVisual != null && s.RootVisual.m_IsDragging);
+                if (item != null)
+                {
+                    item.RootVisual.OnMouseMoveEvent(evt);
+                }
+            });
+            m_Root.RegisterCallback<MouseLeaveEvent>(evt => {
+                StoredItem item = StoredItems.FirstOrDefault(s => s.RootVisual != null && s.RootVisual.m_IsDragging);
+                if (item != null)
+                {
+                    item.RootVisual.ResetToOriginalPosition();
+                }
+            });
+
             ConfigureInventoryTelegraph();
 
             //Wait for UI toolkit to build UI
@@ -111,6 +136,12 @@ namespace Assets.Scripts
         /// </summary>
         private void ConfigureInventoryTelegraph()
         {
+
+            if (m_Telegraph != null)
+            {
+                m_Telegraph.RemoveFromHierarchy();
+            }
+
             //Create telegraphing element
             m_Telegraph = new VisualElement
             {
@@ -164,19 +195,19 @@ namespace Assets.Scripts
         }
 
         public List<InventoryItemData> ConvertGridToData(List<StoredItem> storedItems)
-{
-        List<InventoryItemData> dataList = new List<InventoryItemData>();
-
-        foreach (var item in storedItems)
         {
-            InventoryItemData data = new InventoryItemData();
-            data.id = item.Details.ID;
-            data.pos = item.Position;
-            
-            dataList.Add(data);
+            List<InventoryItemData> dataList = new List<InventoryItemData>();
+
+            foreach (var item in storedItems)
+            {
+                InventoryItemData data = new InventoryItemData();
+                data.id = item.Details.ID;
+                data.pos = item.Position;
+                
+                dataList.Add(data);
+            }
+            return dataList;
         }
-        return dataList;
-    }
 
         public void SaveInventoryToFile()
         {
@@ -189,7 +220,15 @@ namespace Assets.Scripts
 
         public void LoadInventoryFromFile()
         {
-            string jsonData = System.IO.File.ReadAllText(Application.persistentDataPath + "/ship.json");
+            string jsonData;
+
+            if (System.IO.File.Exists(Application.persistentDataPath + "/ship.json"))
+            {
+                jsonData = System.IO.File.ReadAllText(Application.persistentDataPath + "/ship.json");
+            } else {
+                jsonData = Resources.Load<TextAsset>("startingShip").text;
+            }
+
             SerializationWrapper<InventoryItemData> wrapper = JsonUtility.FromJson<SerializationWrapper<InventoryItemData>>(jsonData);
 
             List<StoredItem> loadedItems = new List<StoredItem>();
@@ -215,7 +254,7 @@ namespace Assets.Scripts
         {
             item.RootVisual = visual;
             visual.style.visibility = Visibility.Visible;
-            SetItemPosition(visual, new Vector2(item.Position.x * SlotDimension.Width, item.Position.y * SlotDimension.Height));
+            SetItemPosition(visual, new Vector2(Mathf.FloorToInt(item.Position.x * SlotDimension.Width), Mathf.FloorToInt(item.Position.y * SlotDimension.Height)));
         }
 
         /// <summary>
@@ -270,40 +309,61 @@ namespace Assets.Scripts
         /// Check to see whether the player can place the item and if so, draw the telegraph.
         /// </summary>
         /// <returns>Whether the item can be placed in the target location and the target location</returns>
-        public (bool canPlace, Vector2 position) ShowPlacementTarget(ItemVisual draggedItem)
+        public (bool canPlace, Vector2Int position) ShowPlacementTarget(StoredItem draggedItem)
         {
             //Check to see if it's hanging over the edge - if so, do not place.
-            if (!m_InventoryGrid.layout.Contains(new Vector2(draggedItem.localBound.xMax, draggedItem.localBound.yMax)))
+            if (!m_InventoryGrid.layout.Contains(new Vector2(draggedItem.RootVisual.localBound.xMax, draggedItem.RootVisual.localBound.yMax)))
             {
                 m_Telegraph.style.visibility = Visibility.Hidden;
-                return (canPlace: false, position: Vector2.zero);
+                return (canPlace: false, position: Vector2Int.zero);
             }
 
-            VisualElement targetSlot = m_InventoryGrid.Children().Where(x => x.layout.Overlaps(draggedItem.layout) && x != draggedItem).OrderBy(x => Vector2.Distance(x.worldBound.position, draggedItem.worldBound.position)).First();
+            VisualElement targetSlot = m_InventoryGrid.Children().Where(x => x.layout.Overlaps(draggedItem.RootVisual.layout) && x != draggedItem.RootVisual).OrderBy(x => Vector2.Distance(x.worldBound.position, draggedItem.RootVisual.worldBound.position)).First();
 
-            m_Telegraph.style.width = draggedItem.style.width;
-            m_Telegraph.style.height = draggedItem.style.height;
+            m_Telegraph.style.width = draggedItem.RootVisual.style.width;
+            m_Telegraph.style.height = draggedItem.RootVisual.style.height;
 
             SetItemPosition(m_Telegraph, new Vector2(targetSlot.layout.position.x, targetSlot.layout.position.y));
 
             m_Telegraph.style.visibility = Visibility.Visible;
 
-            var overlappingItems = StoredItems.Where(x => x.RootVisual != null && x.RootVisual.layout.Overlaps(m_Telegraph.layout)).ToArray();
+            // Get telegraph position in grid coordinates
+            Vector2Int tPos = new Vector2Int(Mathf.RoundToInt(targetSlot.layout.position.x / SlotDimension.Width), Mathf.RoundToInt(targetSlot.layout.position.y / SlotDimension.Height));
+            Rect tRect = new Rect(tPos.x, tPos.y, draggedItem.Details.SlotDimension.Width, draggedItem.Details.SlotDimension.Height);
 
-            if (overlappingItems.Length > 1)
+            var overlappingItems = StoredItems.Where(x => {
+                Rect r = new Rect(x.Position.x, x.Position.y, x.Details.SlotDimension.Width, x.Details.SlotDimension.Height);
+                return r.Overlaps(tRect, true) && x != draggedItem;
+            }).ToArray();
+
+            if (overlappingItems.Length > 0)
             {
                 m_Telegraph.style.visibility = Visibility.Hidden;
-                return (canPlace: false, position: Vector2.zero);
+                return (canPlace: false, position: Vector2Int.zero);    
             }
 
-            return (canPlace: true, targetSlot.worldBound.position);
+            return (canPlace: true, tPos);
 
         }
 
-        public void PlaceItem(StoredItem item, Vector2 position)
+        public void HidePlacementTarget() => m_Telegraph.style.visibility = Visibility.Hidden;
+
+        public void PlaceItem(StoredItem item, Vector2Int position)
         {
-            item.Position = new Vector2(MathF.Floor(position.x / SlotDimension.Width), MathF.Floor(position.y / SlotDimension.Height));
+            item.Position = position;
             SaveInventoryToFile();
+        }
+
+        public void ReloadFromSave()
+        {
+            foreach (var item in StoredItems)
+            {
+                item.RootVisual.RemoveFromHierarchy();
+            }
+            
+
+            StoredItems.Clear();
+            LoadInventory();
         }
     }
 }

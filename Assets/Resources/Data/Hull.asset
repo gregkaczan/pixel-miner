@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dcd6b523a36c2fd45bcd65b99cc1c76f, type: 3}
-  m_Name: 8ddeeee2-9381-40a8-87b7-e7a44e96be47
+  m_Name: Hull
   m_EditorClassIdentifier: 
-  ID: 8ddeeee2-9381-40a8-87b7-e7a44e96be47
-  FriendlyName: Light Ammo
-  Description: Light Ammo that can be used with a handgun.
-  SellPrice: 5
-  Icon: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
+  ID: Hull
+  FriendlyName: Hull
+  Description: Outside hull structural component
+  SellPrice: 100
+  Icon: {fileID: 8969505612924361946, guid: 1440ea3f3421bfc4db7aa5d43846c527, type: 3}
   SlotDimension:
-    Height: 2
-    Width: 2
+    Height: 1
+    Width: 1
