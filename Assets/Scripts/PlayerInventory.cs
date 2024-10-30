@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Cysharp.Threading.Tasks;
-
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UIElements;
@@ -36,6 +36,8 @@ namespace Assets.Scripts
     {
         public static PlayerInventory Instance;
 
+        public GameObject shipComponentsGameObject;
+
         private bool m_IsInventoryReady;
         public List<StoredItem> StoredItems = new List<StoredItem>();
 
@@ -51,6 +53,14 @@ namespace Assets.Scripts
 
         private VisualElement m_Telegraph;
 
+        public CinemachineCamera virtualCamera;
+        public float zoomInFOV = 0.1f;
+        public float zoomOutFOV = 0.5f;
+        public float zoomSpeed = 0.5f;
+
+        public CinemachineStateDrivenCamera camera;
+        public Animator animator;
+
         /// <summary>
         /// Set the singleton reference and call Configure
         /// </summary>
@@ -61,6 +71,8 @@ namespace Assets.Scripts
                 Instance = this;
 
                 Configure();
+
+                animator = camera.GetComponent<Animator>();
             }
             else if (Instance != this)
             {
@@ -68,9 +80,11 @@ namespace Assets.Scripts
             }
         }
 
-        private void Start() => LoadInventory();
+        private void Start() {
+            LoadInventory();
+        }
 
-        void Update()
+        async void Update()
         {
             if (Input.GetKeyDown(KeyCode.Tab))
             {
@@ -79,16 +93,33 @@ namespace Assets.Scripts
                 {
                     if (m_Root.Q<VisualElement>("Container").ClassListContains("hidden"))
                     {
-                        m_Root.Q<VisualElement>("Container").RemoveFromClassList("hidden");
-                        Configure();
-                        ReloadFromSave();
+                        await ShowBuildingUIAsync();
                     }
                     else
                     {
-                        m_Root.Q<VisualElement>("Container").AddToClassList("hidden");
+                        HideBuildingUI();
                     }
                 }
             }
+        }
+
+        private async Task ShowBuildingUIAsync()
+        {
+            animator.Play("Building");
+            await UniTask.Delay(230);
+            m_Root.Q<VisualElement>("Container").RemoveFromClassList("hidden");
+            shipComponentsGameObject.transform.parent.gameObject.SetActive(false);
+            Configure();
+            ReloadFromSave();
+                        
+        }
+
+        private void HideBuildingUI()
+        {
+            animator.Play("Main");
+            m_Root.Q<VisualElement>("Container").AddToClassList("hidden");
+            shipComponentsGameObject.transform.parent.gameObject.SetActive(true);
+            shipComponentsGameObject.GetComponent<ShipRendererController>().RenderShip(StoredItems);
         }
 
         /// <summary>
@@ -189,6 +220,8 @@ namespace Assets.Scripts
 
                 ConfigureInventoryItem(loadedItem, inventoryItemVisual);
             }
+
+            shipComponentsGameObject.GetComponent<ShipRendererController>().RenderShip(StoredItems);
 
             SaveInventoryToFile();
             

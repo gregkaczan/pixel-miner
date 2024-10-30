@@ -110,7 +110,7 @@ public class MoveController : MonoBehaviour
     {
         // Rotation code
         Vector2 direction = target - rb.position;
-        float desiredAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + -90f;
+        float desiredAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 90f;
 
         // Calculate the shortest angle difference
         float angleDifference = Mathf.DeltaAngle(rb.rotation, desiredAngle);

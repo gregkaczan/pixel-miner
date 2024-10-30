@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36baaa8bdcb9d8b49b9199833965d2c3, type: 3}
+  m_Name: Inventory Custom Blends
+  m_EditorClassIdentifier: 
+  CustomBlends:
+  - From: CinemachineCamera
+    To: CinemachineCamera (1)
+    Blend:
+      Style: 3
+      Time: 0.2
+      CustomCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0.022127151
+          value: 0.7006302
+          inSlope: 0.30333176
+          outSlope: 0.30333176
+          tangentMode: 34
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0.33333334
+        - serializedVersion: 3
+          time: 0.6107373
+          value: 0.87917435
+          inSlope: 1.079101
+          outSlope: 1.079101
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.08382307
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0.3103962
+          outSlope: 0.3103962
+          tangentMode: 34
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+  - From: CinemachineCamera (1)
+    To: CinemachineCamera
+    Blend:
+      Style: 2
+      Time: 0.2
+      CustomCurve:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 4
