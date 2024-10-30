@@ -16,7 +16,7 @@ public class ShipRendererController : MonoBehaviour
         }
 
         // Render each part of the ship
-        foreach (var storedItem in storedItems.Reverse<StoredItem>())
+        foreach (var storedItem in storedItems)
         {
         // Calculate grid bounds
         int minX = storedItems.Min(item => item.Position.x);
@@ -48,7 +48,7 @@ public class ShipRendererController : MonoBehaviour
         Vector2 spriteSize = spriteRenderer.sprite.bounds.size;
         float scaleX = storedItem.Details.SlotDimension.Width / spriteSize.x;
         float scaleY = storedItem.Details.SlotDimension.Height / spriteSize.y;
-        itemObject.transform.localScale = new Vector3(scaleX, scaleY, 1);
+        itemObject.transform.localScale = new Vector3(scaleX, scaleY * -1, 1);
         }
     }
 }

@@ -11,7 +11,7 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="Inventory" style="flex-grow: 1; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; border-left-color: rgb(255, 128, 0); border-right-color: rgb(255, 128, 0); border-top-color: rgb(255, 128, 0); border-bottom-color: rgb(255, 128, 0); margin-right: 20px; background-image: none; padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px; align-items: center; justify-content: center; -unity-background-scale-mode: scale-to-fit;">
-                <ui:VisualElement name="Grid" style="flex-direction: row; flex-wrap: wrap; align-items: stretch; flex-grow: 0; flex-shrink: 0; height: 894px;">
+                <ui:VisualElement name="Grid" class="grid" style="flex-direction: row; flex-wrap: wrap; align-items: stretch; flex-grow: 0; flex-shrink: 0; height: 894px;">
                     <ui:VisualElement name="SlotIcon" class="slot-icon" />
                     <ui:VisualElement name="SlotIcon" class="slot-icon" />
                     <ui:VisualElement name="SlotIcon" class="slot-icon" />

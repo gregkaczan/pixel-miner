@@ -21,7 +21,7 @@
     height: 100%;
     width: 100%;
     position: absolute;
-    padding: 0px;
+    padding: 0;
     background-color: rgb(14, 14, 14);
     border-width: 1px;
     border-color: rgb(75, 75, 75);
@@ -35,10 +35,6 @@
 
 .slot-icon {
     height: 50px;
-    max-height: 50px;
-    min-height: 20px;
-    min-width: 20px;
-    max-width: 50px;
     width: 50px;
     background-image: none;
     -unity-background-scale-mode: scale-to-fit;
@@ -52,4 +48,8 @@
     transform-origin: center;
     position: absolute;
     visibility: hidden;
+}
+
+.grid {
+    scale: -1 1;
 }
